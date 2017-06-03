@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <!--
+    Needs this ports open (2017-03-16)
+    
+    TCP port 5223 to communicate with APNs.
+    TCP port 2195 to send notifications to APNs.
+    TCP port 2196 for the APNs feedback service.
+    -->
+    
+    <!-- Replace by desired values -->
+    <bean id="apnsServiceFactory" class="org.apache.camel.component.apns.factory.ApnsServiceFactory">
+ 
+        <!-- Optional configuration of feedback host and port -->
+        <property name="feedbackHost" value="feedback.sandbox.push.apple.com" />
+        <property name="feedbackPort" value="2196" />
+ 
+        <!-- Optional configuration of gateway host and port -->
+        <property name="gatewayHost" value="gateway.sandbox.push.apple.com" />
+        <property name="gatewayPort" value="2195" />
+ 
+        <!-- Declaration of certificate used -->
+                <!-- from Camel 2.11 onwards you can use prefix: classpath:, file: to refer to load the certificate from classpath or file. Default it classpath -->
+        <property name="certificatePath" value="CERTIFICATE_PATH" />
+        <property name="certificatePassword" value="CERTIFICATE_PASSWORD" />
+ 
+        <!-- Optional connection strategy - By Default: No need to configure -->
+        <!-- Possible options: NON_BLOCKING, QUEUE, POOL or Nothing -->
+        <!-- <property name="connectionStrategy" value="POOL" /> -->
+        <!-- Optional pool size -->
+        <!-- <property name="poolSize" value="15" /> -->
+ 
+        <!-- Optional connection strategy - By Default: No need to configure -->
+        <!-- Possible options: EVERY_HALF_HOUR, EVERY_NOTIFICATION or Nothing (Corresponds to NEVER javapns option) -->
+        <!-- <property name="reconnectionPolicy" value="EVERY_HALF_HOUR" /> -->
+    </bean>
+ 
+    <bean id="apnsService" factory-bean="apnsServiceFactory" factory-method="getApnsService" />
+ 
+    <!-- Replace this declaration by wanted configuration -->
+    <bean id="apns" class="org.apache.camel.component.apns.ApnsComponent">
+        <property name="apnsService" ref="apnsService" />
+    </bean>
+    
+    <camelContext trace="true" xmlns="http://camel.apache.org/schema/spring">
+        
+        <endpoint id="cli_in" uri="stream:in?promptMessage=Enter something: "></endpoint>
+        <endpoint id="cli_out" uri="stream:out"></endpoint>
+       
+        <route trace="true">
+            <from uri="ref:cli_in"/>
+            <setHeader headerName="CamelApnsMessageType">
+                <constant>PAYLOAD</constant>        
+              </setHeader> 
+            <setBody>
+              <simple trim="false">{"aps":{"alert":"Test notification."},"object":{"id":"1244"}}</simple>
+            </setBody>
+            <to uri="apns:notify?tokens=TOKEN"/>
+        </route>
+        
+    </camelContext>
+
+</beans>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <bean
+            id="socks_proxy"
+            class="com.jcraft.jsch.ProxySOCKS5">
+            <constructor-arg value="socksServer:socksPort"/>
+    </bean>
+
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject">
+            <ref local="socks_proxy"/>
+        </property>
+        <property name="targetMethod">
+            <value>setUserPasswd</value>
+        </property>
+        <property name="arguments">
+            <list>
+                <value>socksUsername</value>
+                <value>socksPassword</value>
+            </list>
+        </property>
+    </bean>
+       
+    <camelContext xmlns="http://camel.apache.org/schema/spring">
+        
+        <endpoint id="cli" uri="stream:in?promptMessage=Enter something: "></endpoint>
+       
+        <route trace="true">
+            <from uri="ref:cli"/>
+            <setHeader headerName="CamelFileName"><constant>test_socks_proxy.test</constant></setHeader>
+            <to uri="sftp://sftpUser@sftpServer:22222/?proxy=#socks_proxy&amp;binary=true&amp;password=RAW(sftpPassword)"/>
+        </route>
+        
+    </camelContext>
+
+</beans>
