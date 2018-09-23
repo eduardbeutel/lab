@@ -1,0 +1,39 @@
+<app id="journal>
+    <menu>
+        <page id="entry" />
+    </menu>
+    
+    <page id="entry">
+    
+        <search>
+            <tableView bind="JournalEntry">
+                <actions create="true" delete="true" />
+                <filters>
+                    <searchField bind="title" />
+                    <dateRangeGroup bind="created" />
+                </filters>
+                <columns layout="70|15|15">
+                    <textField bind="title" />
+                    <dateField bind="created" />
+                    <dateField bind="updated" />
+                </columns>
+            </tableView>
+        </search>
+        
+        <edit>
+            <singleView bind="JournalEntry">
+                <actions update="true" delete="true" clone="true" />
+                <verticalLayout>
+                    <textField bind="title" />
+                    <horizontalLayout>
+                        <dateField bind="created" />
+                        <dateField bind="updated" />
+                    </horizontalLayout>
+                    <richTextArea bind="content" />
+                </verticalLayout>
+            </singleView>
+        </edit>
+        
+    </page>
+    
+</app>
