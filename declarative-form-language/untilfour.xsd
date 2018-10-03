@@ -1,0 +1,182 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="https://github.com/eduardbeutel/untilfour/v1"
+           targetNamespace="https://github.com/eduardbeutel/untilfour/v1"
+           elementFormDefault="qualified">
+
+    <xs:complexType name="app">
+        <xs:sequence>
+            <xs:choice maxOccurs="unbounded">
+                <xs:element name="form" type="form" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="id" type="identifier"/>
+    </xs:complexType>
+
+    <xs:complexType name="form">
+        <xs:choice>
+            <xs:sequence>
+                <xs:group ref="formElements" minOccurs="1" maxOccurs="unbounded" />
+            </xs:sequence>
+            <xs:sequence>
+                <xs:element name="section" type="section" maxOccurs="unbounded" />
+            </xs:sequence>
+        </xs:choice>
+        <xs:attribute name="id" type="identifier" use="required" />
+        <xs:attribute name="standalone" type="xs:boolean" default="true" />
+        <xs:attribute name="single" type="xs:boolean" default="false" />
+    </xs:complexType>
+
+    <xs:complexType name="section" >
+        <xs:group ref="formElements" minOccurs="1" maxOccurs="unbounded" />
+        <xs:attribute name="id" type="identifier" use="required" />
+        <xs:attribute name="activeIf" type="condition"/>
+    </xs:complexType>
+
+    <xs:group name="formElements">
+        <xs:choice>
+            <xs:element name="field" type="field" />
+            <xs:element name="layout" type="layout" />
+            <xs:element name="form" type="formReference" />
+            <xs:element name="action" type="action" />
+        </xs:choice>
+    </xs:group>
+
+    <xs:complexType name="action">
+        <xs:attribute name="id" type="identifier" use="required" />
+        <xs:attribute name="scope" type="actionScope" default="edit" />
+    </xs:complexType>
+
+    <xs:complexType name="formReference">
+        <xs:attribute name="id" type="identifier" use="required" />
+        <xs:attribute name="type" type="formReferenceType" />
+    </xs:complexType>
+
+    <xs:complexType name="layout">
+        <xs:choice maxOccurs="unbounded">
+            <xs:element name="field" type="field" />
+            <xs:element name="layout" type="layout" />
+            <xs:element name="form" type="formReference" />
+        </xs:choice>
+        <xs:attribute name="type" type="layoutType" />
+    </xs:complexType>
+
+    <xs:complexType name="field">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="mustBe" type="comparisonRule" />
+            <xs:element name="set" type="setRule" />
+        </xs:choice>
+        <xs:attribute name="id" type="identifier" use="required" />
+        <xs:attribute name="type" type="fieldType" default="text" />
+        <xs:attribute name="precision" type="xs:token" />
+        <xs:attribute name="mandatory" type="xs:boolean" default="false" />
+        <xs:attribute name="multiple" type="xs:boolean" default="false" />
+        <xs:attribute name="default" type="xs:string" />
+        <xs:attribute name="search" type="xs:boolean" />
+        <xs:attribute name="state" type="state" default="enabled" />
+
+        <xs:attribute name="values" type="xs:token" /> <!-- for type=list -->
+        <xs:attribute name="pattern" type="xs:token" /> <!-- for type=text -->
+        <xs:attribute name="min" type="xs:token" /> <!-- for type=text,number,time,date,dateTime -->
+        <xs:attribute name="max" type="xs:token" /> <!-- for type=text,number,time,date,dateTime -->
+        <xs:attribute name="width" type="xs:integer" default="1" />
+        <xs:attribute name="height" type="xs:integer" default="1" />
+        <xs:attribute name="x" type="xs:integer" /> <!-- starting point for absolute grid layout -->
+        <xs:attribute name="y" type="xs:integer" /> <!-- starting point for absolute grid layout -->
+    </xs:complexType>
+
+    <xs:complexType name="setRule">
+        <xs:attribute name="target" type="identifierPath" />
+        <xs:attribute name="to" type="xs:string" use="required" />
+        <xs:attribute name="if" type="condition" use="required" />
+    </xs:complexType>
+
+    <xs:complexType name="comparisonRule">
+        <xs:attribute name="greater" type="identifierPath" />
+        <xs:attribute name="greaterOrEqual" type="identifierPath" />
+        <xs:attribute name="less" type="identifierPath" />
+        <xs:attribute name="lessOrEqual" type="identifierPath" />
+        <xs:attribute name="equal" type="identifierPath" />
+        <xs:attribute name="notEqual" type="identifierPath" />
+    </xs:complexType>
+
+    <xs:simpleType name="actionScope">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="search" />
+            <xs:enumeration value="edit" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="formReferenceType">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="embedded" />
+            <xs:enumeration value="singleLink" />
+            <xs:enumeration value="multiLink" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="fieldType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="text" />
+            <xs:enumeration value="uppercaseText" />
+            <xs:enumeration value="lowercaseText" />
+            <xs:enumeration value="richText" />
+            <xs:enumeration value="number" /> <!-- precision=[0,1,2,3,4,5,6,7,8,9] number of digits after the decimal point -->
+            <xs:enumeration value="linerScale" /> <!-- used with precision,min,max -->
+            <xs:enumeration value="boolean" />
+            <xs:enumeration value="time" /> <!-- precision=[second,minute,hour] -->
+            <xs:enumeration value="date" /> <!-- precision=[day,month,year] -->
+            <xs:enumeration value="dateTime" /> <!-- precision=[second,minute,hour] -->
+            <xs:enumeration value="listDropdown" />
+            <xs:enumeration value="listGroup" />
+            <xs:enumeration value="file" />
+            <xs:enumeration value="image" />
+            <xs:enumeration value="iframe" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="state">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="enabled" />
+            <xs:enumeration value="disabled" />
+            <xs:enumeration value="hidden" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="layoutType">
+        <xs:restriction base="xs:token">
+            <xs:enumeration value="vertical" />
+            <xs:enumeration value="horizontal" />
+            <!-- Absolute or relative grid layout. If field propertiex x,y are used in a layout then it is absolute. -->
+            <xs:enumeration value="grid2" />
+            <xs:enumeration value="grid3" />
+            <xs:enumeration value="grid4" />
+            <xs:enumeration value="grid5" />
+            <xs:enumeration value="grid6" />
+            <xs:enumeration value="grid7" />
+            <xs:enumeration value="grid8" />
+            <xs:enumeration value="grid9" />
+            <xs:enumeration value="grid10" />
+            <xs:enumeration value="grid11" />
+            <xs:enumeration value="grid12" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="condition">
+        <xs:restriction base="xs:token" />
+    </xs:simpleType>
+
+    <xs:simpleType name="identifierPath">
+        <xs:restriction base="xs:token">
+            <xs:pattern value="[a-z#]([a-zA-Z0-9#.])*"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="identifier">
+        <xs:restriction base="xs:token">
+            <xs:pattern value="[a-z#]([a-zA-Z0-9#])*"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="app" type="app" />
+
+</xs:schema>
