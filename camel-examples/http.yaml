@@ -1,0 +1,14 @@
+# camel-k: language=yaml
+
+- from:
+      uri: "jetty:http://localhost:33897/test"
+      steps:
+        - to: "stream:out"
+
+- from:
+      uri: "stream:in?promptMessage=Enter something: "
+      steps:
+        - to: "http:localhost:33897/test"  
+    
+
+    

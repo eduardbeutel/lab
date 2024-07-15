@@ -1,0 +1,12 @@
+# camel-k: language=yaml
+
+- route:
+    id: "r1"
+    from:
+      uri: "stream:in"
+      parameters:
+        promptMessage: "Enter something:"
+      steps:
+        - to: "stream:out"
+
+    

@@ -1,0 +1,13 @@
+# camel-k: language=yaml
+
+- from:
+    uri: "stream:in"
+    parameters:
+      promptMessage: "Hit enter to trigger poll:"
+    steps:
+      - poll-enrich:
+          constant: "file:queue-to-poll"
+          timeout: "-1"
+      - to: "stream:out"
+
+    

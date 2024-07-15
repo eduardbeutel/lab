@@ -1,0 +1,12 @@
+# camel-k: language=yaml
+
+- route:
+    from:
+      uri: "file:./?fileName=cds.xml&noop=true"
+      steps:
+        - filter: 
+            expression:
+              xpath: "/CATALOG"
+        - to: "stream:out"
+
+    

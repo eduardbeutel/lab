@@ -1,0 +1,11 @@
+# camel-k: language=yaml
+
+- route:
+    id: "r1"
+    from:
+      uri: "file:./?fileName=cds.xml&noop=true"
+      steps:
+        - to: "xslt:file:artists.xsl"
+        - to: "stream:out"
+
+    
