@@ -10,19 +10,19 @@ import java.net.InetAddress;
 
 @RestController
 @SpringBootApplication
-public class HelloipApplication {
+public class HelloIPApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(HelloipApplication.class, args);
+		SpringApplication.run(HelloIPApplication.class, args);
 	}
 
 	@GetMapping("/")
 	public String hello() {
-		String ip = myLocalIP();
+		String ip = getLocalIP();
 		return "Hello from " + ip;
 	}
 
-	public static String myLocalIP() {
+	public static String getLocalIP() {
         try {
 			final DatagramSocket socket = new DatagramSocket();
 			socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
