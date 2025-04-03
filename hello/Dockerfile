@@ -3,11 +3,11 @@
 FROM eclipse-temurin:21-jre-alpine-3.21
 
 # create directory for application
-RUN mkdir app
-# create group app and user app
-RUN addgroup --gid 1000 -S app && adduser --uid 1000 -S app -G app
-# set permissions for app user for the WORKDIR
-RUN chown -R app:app app/
+RUN mkdir app &&\
+    # create group app and user app
+    addgroup --gid 1000 -S app && adduser --uid 1000 -S app -G app &&\
+    # set permissions for app user for the WORKDIR
+    chown -R app:app app/
  # switch to the created user
 USER app
 # switch to the app dir
