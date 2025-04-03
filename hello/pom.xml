@@ -10,9 +10,9 @@
 	</parent>
 
 	<groupId>com.example</groupId>
-	<artifactId>helloip</artifactId>
+	<artifactId>hello</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>helloip</name>
+	<name>hello</name>
 	<description></description>
 	<url/>
 
